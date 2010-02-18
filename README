@@ -1,0 +1,38 @@
+Small testing framework created on top of YUI Test so I can run specific test suites / cases individually.
+
+One of my goals is to be able to call a script from the cmd line to  
+run tests, and pass in optional parameters that specify what test  
+suite or test case I want to run. I've been playing around with a  
+small test framework on top of YUI Test that allows you to pass suite  
+names or test names in the URL of the test HTML page, and it will  
+appropriately block other tests.
+
+In my live example, I have two test suites: /js/tests/ 
+FrameworkTests.js & /js/tests/services/ServiceTests.js. They each have  
+two test cases inside them appropriately named. I have set them up  
+using a convention that attaches the suites to a Y.TestBed object, and  
+they are created as new YUI modules.
+
+So for example, to run all tests:
+/index.html
+
+To run only the FrameworkTests:
+/index.html?suites=framework_tests
+
+Explicitly running both suites:
+/index.html?suites=framework_tests,service_tests
+
+Now only running one test case:
+/index.html?tests=testSome_Service_Thing
+
+Many test cases across suites:
+/index.html?tests=testSome_Service_Thing,testSomeOther_Service_Thing,testSomething_Frameworky
+
+So the suites parameters specifies the suite name (should match the  
+YUI module name too) attached to the Y.TestBed, and the tests  
+parameters should match the actual names of the test functions you  
+want to run.
+
+By allowing the suites/tests to be configured in the URLs, I can  
+create a cmd line script that can easily enough open these in whatever  
+browsers I have available so I don't have to run the entire test bed.
