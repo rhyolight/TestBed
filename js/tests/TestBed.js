@@ -45,27 +45,22 @@ YUI().add('testbed', function(Y) {
             if (testnames.length) {
                 for (i = 0; i < Y.Test.Runner.masterSuite.items.length; i++) {
                     var mSuite = Y.Test.Runner.masterSuite.items[i];
-                    var toRemove = [];
+                    var toIgnore = [];
                     for (j = 0; j < mSuite.items.length; j++) {
                         var mTestCase = mSuite.items[j];
+                        if (!mTestCase._should.ignore) {
+                            mTestCase._should.ignore = {};
+                        }
                         for (var func in mTestCase) {
                             if (mTestCase[func] instanceof Function && func.indexOf('test') == 0) {
                                 var found = false;
                                 for (k = 0; k < testnames.length; k++) {
-                                    if (testnames[k] == func) {
-                                        found = true;
-                                        break;
+                                    if (testnames[k] != func) {
+                                        mTestCase._should.ignore[func] = true;
                                     }
-                                }
-                                if (!found) {
-                                    toRemove.push(j);
                                 }
                             }
                         }
-                    }
-                    for (j = toRemove.length - 1; j >= 0; j--) {
-                        // removing test case
-                        mSuite.items.splice(toRemove[j], 1);
                     }
                 }
             }
