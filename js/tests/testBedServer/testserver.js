@@ -6,7 +6,6 @@ var
   url = require('url'),
   fs = require('fs'),
   multipart = require("multipart"),
-  //paperboy = require('../lib/paperboy'),
   PORT = 8003;
 
 http.createServer(function(req, res) {

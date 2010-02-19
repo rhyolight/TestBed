@@ -1,13 +1,14 @@
-Small testing framework created on top of YUI Test so I can run specific test suites / cases individually.
+Small testing framework created on top of YUI Test and NodeJS so I can run specific test suites / cases individually and report results to the file system.
 
-One of my goals is to be able to call a script from the cmd line to  
-run tests, and pass in optional parameters that specify what test  
-suite or test case I want to run. I've been playing around with a  
-small test framework on top of YUI Test that allows you to pass suite  
-names or test names in the URL of the test HTML page, and it will  
-appropriately block other tests.
+THIS IS A WORKING DRAFT.
 
-In my live example, I have two test suites: /js/tests/ 
+There are two important parts of this project:
+
+1. The TestBed.js testing framework that wraps YUITest
+
+If you structure your test suites correctly, they can easily be run within TestBed, which allows you to add parameters to the URL of a test HTML page that specify the test suites and test methods you want to run. This is useful because now a cmd line script can open this html page and add the parameters, allowing users to specify what tests to run from the cmd line.
+
+In this example, I have two test suites: /js/tests/ 
 FrameworkTests.js & /js/tests/services/ServiceTests.js. They each have  
 two test cases inside them appropriately named. I have set them up  
 using a convention that attaches the suites to a Y.TestBed object, and  
@@ -33,6 +34,8 @@ YUI module name too) attached to the Y.TestBed, and the tests
 parameters should match the actual names of the test functions you  
 want to run.
 
-By allowing the suites/tests to be configured in the URLs, I can  
-create a cmd line script that can easily enough open these in whatever  
-browsers I have available so I don't have to run the entire test bed.
+Currently, there are options for posting test results to the screen in a console window and/or posting results to a nodejs server, which will write XML to the file system.
+
+2. The NodeJS test server
+
+This catches requests from the test page (currently over HTTP, but soon to use websockets) and writes them to XML within the file system.
