@@ -73,11 +73,22 @@ YUI().add('testbed', function(Y) {
             if (cfg.report.screen) {
                 //initialize the console and render
                 new Y.Console(cfg.report.screen).render('#log');
+            } 
+            if (cfg.report.post) {
+                var reporter = new Y.Test.Reporter(cfg.report.post.url);
+				var resultsHandler = function(testResults) {
+				    // before doing the reporting, I want to add another param to the 
+				    // reporter's POST containing the test suite name, this way I don't 
+				    // have to parse the results to get the name on the test server
+                    reporter._fields.suitename = testResults.testSuite.name;
+					reporter.report(testResults.results);
+				};
+                
+                Y.Test.Runner.subscribe(Y.Test.Runner.TEST_SUITE_COMPLETE_EVENT, resultsHandler);
             }
-
+            
             //run the tests
             Y.Test.Runner.run();
-        
         }
     };
-}, '1.0', { requires: ['test', 'console'] });
+}, '1.0', { requires: ['test', 'console', 'event'] });
