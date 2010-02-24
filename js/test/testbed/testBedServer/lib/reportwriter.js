@@ -1,5 +1,6 @@
 var sys = require('sys'),
-    fs = require('fs')
+    fs = require('fs'),
+    REPORTSDIR = 'reports'
 
 exports.handleBody = function(b) {
     sys.puts('writing body of request to file...');
@@ -35,13 +36,13 @@ exports.handleBody = function(b) {
 
 exports.prepDirectory = function() {
     var reportMaker = function() {
-        fs.mkdir('../reports', 0777).addCallback(function() {
+        fs.mkdir(REPORTSDIR, 0777).addCallback(function() {
             sys.puts('empty reports directory created.');
         });
     };
-    fs.stat('../reports').addCallback(function(stats) {
+    fs.stat(REPORTSDIR).addCallback(function(stats) {
         sys.puts('removing existing reports directory...');
-        process.createChildProcess('rm', ['-rf', '../reports']).addListener('exit', function() {
+        process.createChildProcess('rm', ['-rf', REPORTSDIR]).addListener('exit', function() {
             sys.puts('../reports deleted.');
             reportMaker();
         }).addListener('error', function(err) {
