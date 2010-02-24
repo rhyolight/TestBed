@@ -13,7 +13,7 @@ var
   WEBROOT = path.join(path.dirname(__filename), 'webroot');
 
 http.createServer(function(req, res) {
-    var partCnt = 0, outputFile = undefined, fullBody = '', mp = undefined, firstPaperboyReq = true;
+    var partCnt = 0, outputFile = undefined, fullBody = '', mp = undefined;
     
     if (req.method == 'POST') {
         mp = multipart.parse(req),
@@ -49,19 +49,19 @@ http.createServer(function(req, res) {
             .deliver(WEBROOT, req, res)
             .before(function() {
                 sys.puts('paperboy about to deliver ' + req.url);
-                timeOfLastReq = new Date().getTime();
             })
             .after(function() {
                 sys.puts('paperboy delivered ' + req.url);
-                if (firstPaperboyReq) {
-                    firstPaperboyReq = false;
-                    setTimeout(function() {
+                if (timeOfLastReq === 0) {
+                    setInterval(function() {
+                        sys.puts('is it time to die?');
                         if ((new Date().getTime() - timeOfLastReq) > TIME_TO_SEPPUKU) {
                             sys.puts('testserver committing seppuku... URGHUP!!  (such noble death)');
                             process.exit();                                                                        
                         }
-                    }, TIME_TO_SEPPUKU+1000);
+                    }, TIME_TO_SEPPUKU);
                 }
+                timeOfLastReq = new Date().getTime();
             })
             .error(function() {
                 sys.puts('paperboy could not deliver ' + req.url);

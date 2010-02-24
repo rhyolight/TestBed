@@ -104,7 +104,7 @@ exports.deliver = function (webroot, req, res) {
     afterCallback,
     otherwiseCallback,
     errorCallback,
-    filepath = exports.filepath(webroot, req.url),
+    filepath = exports.filepath(webroot, req.url.split('?')[0]), // ignore params
     delegate = {
       error: function (callback) {
         errorCallback = callback;
@@ -123,7 +123,7 @@ exports.deliver = function (webroot, req, res) {
         return delegate;
       }
     };
-
+    
   fs
     .stat(filepath)
     .addCallback(function (stat) {

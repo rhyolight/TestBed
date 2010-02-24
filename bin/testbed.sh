@@ -1,29 +1,37 @@
 #!/bin/bash
 
 # TODO: allow for not only 'en1' but 'eth0'
-MYIP=`ifconfig en1 | grep 'inet ' | cut -d " " -f 2`
-WEBROOT=js/test/testbed/testBedServer/webroot
-TMP=/tmp/testbed
+ipAddress=`ifconfig en1 | grep 'inet ' | cut -d " " -f 2`
+port=8003
+selectors=$1
+url="http://$ipAddress:$port"
+webRoot=js/test/testbed/testBedServer/webroot
+tmpDir=/tmp/testbed
 
-if [ -e TMP ]; then
-    rm -rf $TMP
+if [ -n "$selectors" ]; then
+    url=$url?$1
 fi
 
-mkdir $TMP
+if [ -e tmpDir ]; then
+    rm -rf $tmpDir
+fi
 
-# echo "--> removing existing webroot at $WEBROOT"
-rm -rf $WEBROOT
+mkdir $tmpDir
+
+# echo "--> removing existing webroot at $webRoot"
+rm -rf $webRoot
 # echo "--> copying to staging directory"
-cp index.html $TMP
-cp -r js $TMP
+cp index.html $tmpDir
+cp -r js $tmpDir
 # echo "--> removing testbed server from stagin directory"
-rm -rf $TMP/js/test/testbed/testBedServer
+rm -rf $tmpDir/js/test/testbed/testBedServer
 # echo "--> creating new webroot"
 mkdir js/test/testbed/testBedServer/webroot
 # echo "--> copying over stating into webroot"
-cp -r $TMP/* $WEBROOT
+cp -r $tmpDir/* $webRoot
 
 # server will kill itself after it gets a request for static files
 node js/test/testbed/testBedServer/testserver.js &
 
-java -jar lib/yuitest-selenium-driver-0.5.2.jar --conf yui-test-driver.properties http://$MYIP:8003
+echo "Sending $url to Selenium server for testing..."
+java -jar lib/yuitest-selenium-driver-0.5.2.jar --conf yui-test-driver.properties $url
