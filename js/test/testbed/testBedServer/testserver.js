@@ -7,19 +7,16 @@ var
   fs = require('fs'),
   multipart = require('multipart'),
   paperboy = require('./lib/paperboy'),
+  seppuku = require('./lib/seppuku'),
   PORT = 8003,
   TIME_TO_SEPPUKU = 15000,
-  timeOfLastReq = 0,
   WEBROOT = path.join(path.dirname(__filename), 'webroot');
-
+  
 http.createServer(function(req, res) {
     var partCnt = 0, outputFile = undefined, fullBody = '', mp = undefined;
     
     if (req.method == 'POST') {
-        mp = multipart.parse(req),
-            fields = {},
-            name,
-            filename;
+        mp = multipart.parse(req);
         mp.addListener("error", function(er) {
             res.sendHeader(400, {"content-type": "text/plain"});
             res.write("You sent a bad message!n" + er.message);
@@ -43,6 +40,7 @@ http.createServer(function(req, res) {
             res.write('');
             sys.puts('closing request');
             res.close();
+            seppuku.suicideWatch();
         });
     } else {
         paperboy
@@ -52,16 +50,7 @@ http.createServer(function(req, res) {
             })
             .after(function() {
                 sys.puts('paperboy delivered ' + req.url);
-                if (timeOfLastReq === 0) {
-                    setInterval(function() {
-                        sys.puts('is it time to die?');
-                        if ((new Date().getTime() - timeOfLastReq) > TIME_TO_SEPPUKU) {
-                            sys.puts('testserver committing seppuku... URGHUP!!  (such noble death)');
-                            process.exit();                                                                        
-                        }
-                    }, TIME_TO_SEPPUKU);
-                }
-                timeOfLastReq = new Date().getTime();
+                seppuku.suicideWatch();
             })
             .error(function() {
                 sys.puts('paperboy could not deliver ' + req.url);

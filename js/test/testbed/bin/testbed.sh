@@ -9,7 +9,7 @@ webroot=js/test/testbed/testBedServer/webroot
 tmpDir=/tmp/testbed
 
 testhtml=''
-isLocal=false
+isLocal=0
 testnames=''
 suitenames=''
 
@@ -19,7 +19,7 @@ processOptions () {
     do
       case "$optname" in
         "l")
-          isLocal=true
+          isLocal=1
           ;;
         "t")
           testnames=$OPTARG
@@ -53,10 +53,6 @@ processOptions "$@"
 argstart=$?
 processArguments "${@:argstart}"
 
-echo "test html: $testhtml"
-echo "testnames: $testnames"
-echo "suitenames: $suitenames"
-
 if [ -n "$testhtml" ]; then
     url+="/$testhtml"
 fi
@@ -71,7 +67,7 @@ if [ -n "$testnames" ]; then
     url+="${delimit}tests=${testnames}"
 fi
 
-echo "URL: $url"
+# echo "URL: $url"
 
 if [ -e tmpDir ]; then
     rm -rf $tmpDir
@@ -95,5 +91,9 @@ rm -rf $tmpDir
 # server will kill itself after not getting any requests for awhile
 node js/test/testbed/testBedServer/testserver.js &
 
-echo "Sending $url to Selenium server for testing..."
-java -jar js/test/testbed/lib/yuitest-selenium-driver-0.5.2.jar --conf js/test/testbed/yui-test-driver.properties $url
+if [ "$isLocal" -eq "0" ] ; then
+    echo "Sending $url to Selenium server for testing..."
+    java -jar js/test/testbed/lib/yuitest-selenium-driver-0.5.2.jar --conf js/test/testbed/yui-test-driver.properties $url
+else
+    open $testhtml
+fi

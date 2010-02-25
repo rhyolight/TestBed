@@ -9,7 +9,7 @@ exports.handleBody = function(b) {
         var p = piece.split('=');
         params[p[0]] = p[1];
     });
-    var filepath = '../reports/' + params.suitename + '.xml';
+    var filepath = REPORTSDIR + '/' + params.suitename + '.xml';
     sys.puts('... to ' + filepath);
     fs.unlink(filepath)
         .addCallback(function() { sys.puts('old ' + filepath + ' deleted.')})
