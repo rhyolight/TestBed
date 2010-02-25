@@ -1,41 +1,61 @@
-Small testing framework created on top of YUI Test and NodeJS so I can run specific test suites / cases individually and report results to the file system.
+TestBed
+-------
 
-THIS IS A WORKING DRAFT.
+* THIS SOFTWARE IS UNDER DEVELOPMENT *
 
-There are two important parts of this project:
+:: Summary ::
 
-1. The TestBed.js testing framework that wraps YUITest
+TestBed is a lightweight extension to YUI Test that provides:
+- selective test and suite execution from command line
+- local or remote test execution and reporting (on screen or JUnit XML)
+- Selenium integration for multi-environment tests
 
-If you structure your test suites correctly, they can easily be run within TestBed, which allows you to add parameters to the URL of a test HTML page that specify the test suites and test methods you want to run. This is useful because now a cmd line script can open this html page and add the parameters, allowing users to specify what tests to run from the cmd line.
+:: Requires ::
 
-In this example, I have two test suites: /js/tests/ 
-FrameworkTests.js & /js/tests/services/ServiceTests.js. They each have  
-two test cases inside them appropriately named. I have set them up  
-using a convention that attaches the suites to a Y.TestBed object, and  
-they are created as new YUI modules.
+- NodeJS
+- YUI3 & YUI Test
+- A Selenium server (only for remote testing)
+- Selenium Test Driver http://wiki.github.com/nzakas/yuitest/selenium-driver (only for remote testing)
+- Java (for selenium test driver)
 
-So for example, to run all tests:
-/index.html
+:: Usage ::
 
-To run only the FrameworkTests:
-/index.html?suites=framework_tests
+Write tests normally with YUI Test. All tests must be added to the Y.Test.Runner for TestBed to have access to them. To install TestBed, copy the entire testbed directory into js/tests (or wherever you wish). In your test html files, include the TestBed.js script.
 
-Explicitly running both suites:
-/index.html?suites=framework_tests,service_tests
+Replace your call to Y.Test.Runner.run() with a call to Y.TestBed.run(). You can pass it configuration for console logging or remote test result posting to other servers.
 
-Now only running one test case:
-/index.html?tests=testSome_Service_Thing
+For example:
 
-Many test cases across suites:
-/index.html?tests=testSome_Service_Thing,testSomeOther_Service_Thing,testSomething_Frameworky
+Y.TestBed.run({
+	report: {
+		screen: true,
+		post: {
+			url: "http://localhost:8003" // posts to the nodejs server
+		}
+	}
+});
 
-So the suites parameters specifies the suite name (should match the  
-YUI module name too) attached to the Y.TestBed, and the tests  
-parameters should match the actual names of the test functions you  
-want to run.
+Now run the testbed.sh script in testbed/bin:
 
-Currently, there are options for posting test results to the screen in a console window and/or posting results to a nodejs server, which will write XML to the file system.
+./testbed/bin/testbed.sh
 
-2. The NodeJS test server
+	script options:
+	-l		run locally, without using selenium
+	-t <names>	test names, comma delimited, no spaces
+	-s <suites>	suite names, comma delimited, no spaces
+	-p		posts test results to local nodejs server in local mode
 
-This catches requests from the test page (currently over HTTP, but soon to use websockets) and writes them to XML within the file system.
+This script runs in two modes: local, remote.
+
+Local: In this mode, the script will start up a local nodejs server (if -p is specified), then open up the test html file in the default browser. If -p is specified and the report.post.url option of Y.TestBed.run configuration is set, the test will post results to the url specified.
+
+Remote: When run without the -l option, local files are staged and moved into the nodejs webroot so they can be run in a web server. Selenium needs these tests to be running in a server for it to evaluate tests. The nodejs server will server up the html and tests, and the script will notify selenium of the test location. Once the nodejs server stops receiving requests, it will shut down.
+
+:: Components ::
+
+Bash Script --
+TODO
+TestBed JavaScript Framework --
+TODO
+NodeJS Server --
+TODO
