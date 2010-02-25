@@ -20,36 +20,63 @@ YUI().add('testbed', function(Y) {
             }
         }
     }
+    
+    
+    function ignoreAllInSuite(suite) {
+        var i=0;
+        for (; i < suite.items.length; i++) {
+            ignoreAllInCase(suite.items[i]);
+        }
+        return suite;
+    }
+    
+    function ignoreAllInCase(testCase) {
+        if (!testCase._should.ignore) {
+            testCase._should.ignore = {};
+        }
+        for (var testName in testCase) {
+            if (testCase[testName] instanceof Function && testName.indexOf('test') == 0) {
+                testCase._should.ignore[testName] = true;
+            }
+        }
+    }
+
+    function contains(el, arr) {
+        var i=0;
+        for (; i < arr.length; i++) {
+            if (arr[i] == el) { return true; }
+        }
+        return false;
+    }
+    
 	
 	Y.TestBed = {
         run: function(cfg) {
-            var suites = extractParam('suites'),
-                testnames = null,
+            var whitesuites = extractParam('suites'),
+                blacksuites = [],
+                //testcases = extractParam('cases'),
+                //blackcases = [],
+                testnames = extractParam('tests'),
                 i = 0, j = 0, k = 0,
-                testsuite = null; 
+                testsuite, testname; 
             
-            if (suites.length) {
-                // run only specified suites
-                for(i = 0; i < suites.length; i++) {
-                    Y.log('adding specified suite: ' + this[suites[i]].name);
-                    Y.Test.Runner.add(this[suites[i]]);
-                }
-            } else {
-                // run all suites
-                for (testsuite in this) {
-                    if (!(this[testsuite] instanceof Function)) {
-                        Y.log('adding default suite: ' + this[testsuite].name);
-                        Y.Test.Runner.add(this[testsuite]);
+            for (testsuite in this) {
+                if (!(this[testsuite] instanceof Function)) {
+                    Y.log('adding default suite: ' + this[testsuite].name);
+                    Y.Test.Runner.add(this[testsuite]);
+                    
+                    if ((whitesuites.length || testnames.length) && !contains(testsuite, whitesuites)) {
+                        ignoreAllInSuite(this[testsuite]);
+                        blacksuites.push(this[testsuite]);
                     }
                 }
             }
                         
             // if there are testnames as well, turn off all tests in the suites
             // specified except the named tests
-            testnames = extractParam('tests');
             if (testnames.length) {
-                for (i = 0; i < Y.Test.Runner.masterSuite.items.length; i++) {
-                    var mSuite = Y.Test.Runner.masterSuite.items[i];
+                for (i = 0; i < blacksuites.length; i++) {
+                    var mSuite = blacksuites[i];
                     for (j = 0; j < mSuite.items.length; j++) {
                         var mTestCase = mSuite.items[j];
                         if (!mTestCase._should.ignore) {

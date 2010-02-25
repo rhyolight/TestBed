@@ -8,7 +8,7 @@ var
   multipart = require('multipart'),
   paperboy = require('./lib/paperboy'),
   PORT = 8003,
-  TIME_TO_SEPPUKU = 10000,
+  TIME_TO_SEPPUKU = 15000,
   timeOfLastReq = 0,
   WEBROOT = path.join(path.dirname(__filename), 'webroot');
 

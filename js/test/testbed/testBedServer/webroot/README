@@ -1,0 +1,41 @@
+Small testing framework created on top of YUI Test and NodeJS so I can run specific test suites / cases individually and report results to the file system.
+
+THIS IS A WORKING DRAFT.
+
+There are two important parts of this project:
+
+1. The TestBed.js testing framework that wraps YUITest
+
+If you structure your test suites correctly, they can easily be run within TestBed, which allows you to add parameters to the URL of a test HTML page that specify the test suites and test methods you want to run. This is useful because now a cmd line script can open this html page and add the parameters, allowing users to specify what tests to run from the cmd line.
+
+In this example, I have two test suites: /js/tests/ 
+FrameworkTests.js & /js/tests/services/ServiceTests.js. They each have  
+two test cases inside them appropriately named. I have set them up  
+using a convention that attaches the suites to a Y.TestBed object, and  
+they are created as new YUI modules.
+
+So for example, to run all tests:
+/index.html
+
+To run only the FrameworkTests:
+/index.html?suites=framework_tests
+
+Explicitly running both suites:
+/index.html?suites=framework_tests,service_tests
+
+Now only running one test case:
+/index.html?tests=testSome_Service_Thing
+
+Many test cases across suites:
+/index.html?tests=testSome_Service_Thing,testSomeOther_Service_Thing,testSomething_Frameworky
+
+So the suites parameters specifies the suite name (should match the  
+YUI module name too) attached to the Y.TestBed, and the tests  
+parameters should match the actual names of the test functions you  
+want to run.
+
+Currently, there are options for posting test results to the screen in a console window and/or posting results to a nodejs server, which will write XML to the file system.
+
+2. The NodeJS test server
+
+This catches requests from the test page (currently over HTTP, but soon to use websockets) and writes them to XML within the file system.
