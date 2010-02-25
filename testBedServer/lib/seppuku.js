@@ -5,9 +5,9 @@ var sys = require('sys'),
 exports.suicideWatch = function() {
     if (timeOfLastReq === 0) {
           setInterval(function() {
-              sys.puts('is it time to die?');
+              // sys.puts('the time for my death draws near...');
               if ((new Date().getTime() - timeOfLastReq) > TIME_TO_SEPPUKU) {
-                  sys.puts('testserver committing seppuku... URGHUP!!  (such noble death)');
+                  sys.puts('testbed server committing seppuku... URGHUP!!  (such noble death)');
                   process.exit();                                                                        
               }
           }, (TIME_TO_SEPPUKU / 2));

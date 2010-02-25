@@ -8,18 +8,22 @@ url="http://$ipAddress:$port"
 webroot=js/test/testbed/testBedServer/webroot
 tmpDir=/tmp/testbed
 
-testhtml=''
+testhtml='index.html'
 isLocal=0
+postResults=0
 testnames=''
 suitenames=''
 
 # cmd line options processing
 processOptions () {
-  while getopts "lt:s:" optname
+  while getopts "lpt:s:" optname
     do
       case "$optname" in
         "l")
           isLocal=1
+          ;;
+        "p")
+          postResults=1
           ;;
         "t")
           testnames=$OPTARG
@@ -46,7 +50,9 @@ processOptions () {
 }
 # cmd line argument processing
 processArguments() {
-  testhtml="$1"
+    if [ $1 ]; then
+        testhtml="$1"
+    fi
 }
 
 processOptions "$@"
@@ -75,25 +81,29 @@ fi
 
 mkdir $tmpDir
 
-echo "--> removing existing webroot at $webroot"
-rm -rf $webroot
-echo "--> copying to staging directory"
-tar -C . --wildcards --wildcards-match-slash --exclude={reports,.git,*yui*/src,*yui*/api,*yui*/as-api,*yui*/sandbox,yui*/src} -hcf - . | tar -C $tmpDir -xpf -
-echo "--> removing testbed server from stagin directory"
-rm -rf $tmpDir/js/test/testbed/testBedServer $tmpDir/js/test/testbed/bin $tmpDir/js/test/testbed/lib
-echo "--> creating new webroot"
-mkdir js/test/testbed/testBedServer/webroot
-echo "--> copying over staging into webroot"
-cp -r $tmpDir/* $webroot
-echo "--> removing tmpdir at $tmpDir"
-rm -rf $tmpDir
-
-# server will kill itself after not getting any requests for awhile
-node js/test/testbed/testBedServer/testserver.js &
-
 if [ "$isLocal" -eq "0" ] ; then
+    echo "--> removing existing webroot at $webroot"
+    rm -rf $webroot
+    echo "--> copying to staging directory"
+    tar -C . --wildcards --wildcards-match-slash --exclude={reports,.git,*yui*/src,*yui*/api,*yui*/as-api,*yui*/sandbox,yui*/src} -hcf - . | tar -C $tmpDir -xpf -
+    echo "--> removing testbed server from stagin directory"
+    rm -rf $tmpDir/js/test/testbed/testBedServer $tmpDir/js/test/testbed/bin $tmpDir/js/test/testbed/lib
+    echo "--> creating new webroot"
+    mkdir js/test/testbed/testBedServer/webroot
+    echo "--> copying over staging into webroot"
+    cp -r $tmpDir/* $webroot
+    echo "--> removing tmpdir at $tmpDir"
+    rm -rf $tmpDir
+
+    # server will kill itself after not getting any requests for awhile
+    node js/test/testbed/testBedServer/testserver.js &
+    
     echo "Sending $url to Selenium server for testing..."
     java -jar js/test/testbed/lib/yuitest-selenium-driver-0.5.2.jar --conf js/test/testbed/yui-test-driver.properties $url
 else
+    if [ "$postResults" -gt "0" ] ; then
+        node js/test/testbed/testBedServer/testserver.js &
+    fi
+    echo "Opening $testhtml locally with default browser"
     open $testhtml
 fi
