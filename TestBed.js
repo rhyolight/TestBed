@@ -54,20 +54,16 @@ YUI().add('testbed', function(Y) {
         run: function(cfg) {
             var whitesuites = extractParam('suites'),
                 blacksuites = [],
-                //testcases = extractParam('cases'),
-                //blackcases = [],
                 testnames = extractParam('tests'),
                 i = 0, j = 0, k = 0,
                 testsuite, testname; 
             
-            for (testsuite in this) {
-                if (!(this[testsuite] instanceof Function)) {
-                    Y.log('adding default suite: ' + this[testsuite].name);
-                    Y.Test.Runner.add(this[testsuite]);
-                    
-                    if ((whitesuites.length || testnames.length) && !contains(testsuite, whitesuites)) {
-                        ignoreAllInSuite(this[testsuite]);
-                        blacksuites.push(this[testsuite]);
+            for (; i < Y.Test.Runner.masterSuite.items.length; i++) {
+                testsuite = Y.Test.Runner.masterSuite.items[i];
+                if (!(Y.Test.Runner.masterSuite.items[testsuite] instanceof Function)) {
+                    if ((whitesuites.length || testnames.length) && !contains(testsuite.name, whitesuites)) {
+                        ignoreAllInSuite(testsuite);
+                        blacksuites.push(testsuite);
                     }
                 }
             }
