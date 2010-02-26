@@ -20,7 +20,7 @@ TestBed is a lightweight extension to YUI Test that provides:
 
 :: Usage ::
 
-Write tests normally with YUI Test. All tests must be added to the Y.Test.Runner for TestBed to have access to them. To install TestBed, copy the entire testbed directory into js/tests (or wherever you wish). In your test html files, include the TestBed.js script.
+Write tests normally with YUI Test. Each test must be added to the Y.Test.Runner normally for TestBed to recognize them. To install TestBed, copy the entire testbed directory into js/tests (or wherever you wish). In your test html files, include the TestBed.js script.
 
 Replace your call to Y.Test.Runner.run() with a call to Y.TestBed.run(). You can pass it configuration for console logging or remote test result posting to other servers.
 

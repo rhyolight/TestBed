@@ -63,7 +63,8 @@ if [ -n "$testhtml" ]; then
     url+="/$testhtml"
 fi
 if [ -n "$suitenames" ]; then
-    url=$url?suites=$suitenames
+    url+="?suites=$suitenames"
+    testhtml+="?suites=$suitenames"
 fi
 if [ -n "$testnames" ]; then
     delimit='?'
@@ -71,6 +72,7 @@ if [ -n "$testnames" ]; then
         delimit='&'
     fi
     url+="${delimit}tests=${testnames}"
+    testhtml+="${delimit}tests=${testnames}"
 fi
 
 # echo "URL: $url"
@@ -105,5 +107,5 @@ else
         node js/test/testbed/testBedServer/testserver.js &
     fi
     echo "Opening $testhtml locally with default browser"
-    open $testhtml
+    firefox -new-tab $testhtml
 fi
